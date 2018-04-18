@@ -40,7 +40,7 @@ namespace DotNetMigrations.Commands
         /// </summary>
         protected override void Execute(GenerateScriptCommandArgs args)
         {
-            string path = _migrationDirectory.CreateBlankScript(args.MigrationName);
+            string path = _migrationDirectory.CreateBlankScript(args);
 
             Log.WriteLine("The new migration script " + Path.GetFileName(path) + " was created successfully!");
         }

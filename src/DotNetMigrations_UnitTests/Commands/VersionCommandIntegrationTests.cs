@@ -49,7 +49,7 @@ namespace DotNetMigrations.UnitTests.Commands
         public void Run_should_create_schema_migrations_table_if_it_doesnt_exist()
         {
             //  arrange
-            _mockMigrationDir.Setup(dir => dir.GetScripts()).Returns(Enumerable.Empty<IMigrationScriptFile>);
+            _mockMigrationDir.Setup(dir => dir.GetScripts(_commandArgs)).Returns(Enumerable.Empty<IMigrationScriptFile>);
 
             //  act
             _versionCommand.Run(_commandArgs);
@@ -70,7 +70,7 @@ namespace DotNetMigrations.UnitTests.Commands
             //  arrange
             InitializeDatabase();
 
-            _mockMigrationDir.Setup(dir => dir.GetScripts()).Returns(Enumerable.Empty<IMigrationScriptFile>);
+            _mockMigrationDir.Setup(dir => dir.GetScripts(_commandArgs)).Returns(Enumerable.Empty<IMigrationScriptFile>);
 
             //  update schema_migrations table with a specific version number
             using (var sql = new SqlDatabaseHelper(TestConnectionString))
@@ -89,7 +89,7 @@ namespace DotNetMigrations.UnitTests.Commands
         public void Run_should_log_database_schema_version_as_0_if_schema_migrations_table_doesnt_exist()
         {
             //  arrange
-            _mockMigrationDir.Setup(dir => dir.GetScripts()).Returns(Enumerable.Empty<IMigrationScriptFile>);
+            _mockMigrationDir.Setup(dir => dir.GetScripts(_commandArgs)).Returns(Enumerable.Empty<IMigrationScriptFile>);
 
             //  act
             _versionCommand.Run(_commandArgs);
@@ -108,7 +108,7 @@ namespace DotNetMigrations.UnitTests.Commands
                                       new MigrationScriptFile("C:\\1_first.sql"),
                                       new MigrationScriptFile("C:\\2_second.sql")
                                   };
-            _mockMigrationDir.Setup(dir => dir.GetScripts()).Returns(scriptFiles);
+            _mockMigrationDir.Setup(dir => dir.GetScripts(_commandArgs)).Returns(scriptFiles);
 
             //  act
             _versionCommand.Run(_commandArgs);
@@ -121,7 +121,7 @@ namespace DotNetMigrations.UnitTests.Commands
         public void Run_should_add_message_that_database_is_up_to_date_if_version_is_equal_to_latest_script()
         {
             //  arrange
-            _mockMigrationDir.Setup(dir => dir.GetScripts()).Returns(Enumerable.Empty<IMigrationScriptFile>);
+            _mockMigrationDir.Setup(dir => dir.GetScripts(_commandArgs)).Returns(Enumerable.Empty<IMigrationScriptFile>);
 
             //  act
             _versionCommand.Run(_commandArgs);

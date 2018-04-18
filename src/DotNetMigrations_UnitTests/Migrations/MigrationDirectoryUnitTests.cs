@@ -42,7 +42,7 @@ namespace DotNetMigrations.UnitTests.Migrations
             int totalInvalidCharsInName = invalidChars.Length;
 
             //  act
-            string path = _subject.CreateBlankScript(migrationName);
+            string path = _subject.CreateBlankScript(new DotNetMigrations.Commands.GenerateScriptCommandArgs() { MigrationName = migrationName });
 
             using (DisposableFile file = DisposableFile.Watch(path))
             {
@@ -61,7 +61,7 @@ namespace DotNetMigrations.UnitTests.Migrations
             const string migrationName = "my first     script";
 
             //  act
-            string path = _subject.CreateBlankScript(migrationName);
+            string path = _subject.CreateBlankScript(new DotNetMigrations.Commands.GenerateScriptCommandArgs() { MigrationName = migrationName });
 
             using (DisposableFile file = DisposableFile.Watch(path))
             {
@@ -80,7 +80,7 @@ namespace DotNetMigrations.UnitTests.Migrations
             const string migrationName = "    my first script    ";
 
             //  act
-            string path = _subject.CreateBlankScript(migrationName);
+            string path = _subject.CreateBlankScript(new DotNetMigrations.Commands.GenerateScriptCommandArgs() { MigrationName = migrationName });
 
             using (DisposableFile file = DisposableFile.Watch(path))
             {
@@ -99,7 +99,7 @@ namespace DotNetMigrations.UnitTests.Migrations
             const string migrationName = "my first script";
 
             //  act
-            string path = _subject.CreateBlankScript(migrationName);
+            string path = _subject.CreateBlankScript(new DotNetMigrations.Commands.GenerateScriptCommandArgs() { MigrationName = migrationName });
 
             using (DisposableFile file = DisposableFile.Watch(path))
             {
@@ -126,7 +126,7 @@ namespace DotNetMigrations.UnitTests.Migrations
             const string teardownEndTag = "END_TEARDOWN:";
 
             //  act
-            string path = _subject.CreateBlankScript(migrationName);
+            string path = _subject.CreateBlankScript(new DotNetMigrations.Commands.GenerateScriptCommandArgs() { MigrationName = migrationName });
 
             using (DisposableFile file = DisposableFile.Watch(path))
             {
@@ -152,7 +152,7 @@ namespace DotNetMigrations.UnitTests.Migrations
             const string migrationName = "my first script";
 
             //  act
-            string path = _subject.CreateBlankScript(migrationName);
+            string path = _subject.CreateBlankScript(new DotNetMigrations.Commands.GenerateScriptCommandArgs() { MigrationName = migrationName });
 
             using (DisposableFile.Watch(path))
             {
@@ -171,7 +171,23 @@ namespace DotNetMigrations.UnitTests.Migrations
                 _configManager.AppSettings[AppSettingKeys.MigrateFolder] = path;
 
                 //  act
-                _subject.GetPath(null);
+                _subject.GetPath(null, new DotNetMigrations.Commands.GenerateScriptCommandArgs());
+
+                //  assert
+                bool pathExists = Directory.Exists(path);
+                Assert.IsTrue(pathExists);
+            }
+        }
+
+        [Test]
+        public void GetPath_should_create_path_if_it_doesnt_exist_by_parameter()
+        {
+            //  arrange
+            string path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            using (DisposableDirectory.Watch(path))
+            {
+                //  act
+                _subject.GetPath(null, new DotNetMigrations.Commands.GenerateScriptCommandArgs() { ScriptsDirectoryPath = path });
 
                 //  assert
                 bool pathExists = Directory.Exists(path);
@@ -186,7 +202,7 @@ namespace DotNetMigrations.UnitTests.Migrations
             var logger = new MockLog1();
 
             //  act
-            string path = _subject.GetPath(logger);
+            string path = _subject.GetPath(logger, new DotNetMigrations.Commands.GenerateScriptCommandArgs());
             using (DisposableDirectory.Watch(path))
             {
                 //  assert
@@ -198,7 +214,7 @@ namespace DotNetMigrations.UnitTests.Migrations
         public void GetPath_should_return_default_path_if_migrateFolder_appSetting_isnt_found()
         {
             //  act
-            string path = _subject.GetPath(null);
+            string path = _subject.GetPath(null, new DotNetMigrations.Commands.GenerateScriptCommandArgs());
             using (DisposableDirectory.Watch(path))
             {
                 //  assert
@@ -220,7 +236,7 @@ namespace DotNetMigrations.UnitTests.Migrations
                 FileHelper.Touch(Path.Combine(path, "2_script_two.sql"));
 
                 //  act
-                IEnumerable<IMigrationScriptFile> files = _subject.GetScripts();
+                IEnumerable<IMigrationScriptFile> files = _subject.GetScripts(new DotNetMigrations.Commands.GenerateScriptCommandArgs());
 
                 //  assert
                 const int expectedCount = 2;
@@ -238,7 +254,7 @@ namespace DotNetMigrations.UnitTests.Migrations
                 _configManager.AppSettings[AppSettingKeys.MigrateFolder] = emptyDir.FullName;
 
                 //  act
-                IEnumerable<IMigrationScriptFile> files = _subject.GetScripts();
+                IEnumerable<IMigrationScriptFile> files = _subject.GetScripts(new DotNetMigrations.Commands.GenerateScriptCommandArgs());
 
                 //  assert
                 const int expectedCount = 0;
@@ -260,7 +276,7 @@ namespace DotNetMigrations.UnitTests.Migrations
                 FileHelper.Touch(Path.Combine(path, "10_script_ten.sql"));
 
                 //  act
-                IEnumerable<IMigrationScriptFile> files = _subject.GetScripts();
+                IEnumerable<IMigrationScriptFile> files = _subject.GetScripts(new DotNetMigrations.Commands.GenerateScriptCommandArgs());
 
                 //  assert
                 Assert.IsTrue(files.First().Version == 1);

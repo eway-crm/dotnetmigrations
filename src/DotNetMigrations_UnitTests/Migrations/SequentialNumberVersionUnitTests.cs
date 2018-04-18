@@ -7,6 +7,7 @@ using DotNetMigrations.Migrations;
 using DotNetMigrations.UnitTests.Mocks;
 using DotNetMigrations.UnitTests.Stubs;
 using NUnit.Framework;
+using DotNetMigrations.Commands;
 
 namespace DotNetMigrations.UnitTests.Migrations
 {
@@ -34,7 +35,7 @@ namespace DotNetMigrations.UnitTests.Migrations
             var migDir = new MigrationDirectory(_configManager);
             
             // act
-            var num = _subject.GetNewVersionNumber(migDir);
+            var num = _subject.GetNewVersionNumber(migDir, new GenerateScriptCommandArgs());
 
             // assert
             Assert.AreEqual(1, num);

@@ -26,7 +26,7 @@ namespace DotNetMigrations.UnitTests.Commands
             _mockMigrationScripts = new List<IMigrationScriptFile>();
 
             _mockMigrationDir = new Mock<IMigrationDirectory>();
-            _mockMigrationDir.Setup(x => x.GetScripts()).Returns(() => _mockMigrationScripts);
+            _mockMigrationDir.Setup(x => x.GetScripts(_commandArgs)).Returns(() => _mockMigrationScripts);
 
             _migrateCommand = new MigrateCommand(_mockMigrationDir.Object);
             _migrateCommand.Log = _mockLog;

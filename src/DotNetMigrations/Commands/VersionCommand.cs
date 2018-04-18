@@ -41,7 +41,7 @@ namespace DotNetMigrations.Commands
         protected override void Execute(DatabaseCommandArguments args)
         {
             // Obtain Latest Script Version
-            long scriptVersion = GetLatestScriptVersion();
+            long scriptVersion = GetLatestScriptVersion(args);
 
             // Obtain Latest Database Version
             long databaseVersion = GetDatabaseVersion();
@@ -60,9 +60,9 @@ namespace DotNetMigrations.Commands
         /// Retrieves the latest migration script version from the migration directory.
         /// </summary>
         /// <returns>The latest script version</returns>
-        private long GetLatestScriptVersion()
+        private long GetLatestScriptVersion(DatabaseCommandArguments args)
         {
-            IOrderedEnumerable<IMigrationScriptFile> files = _migrationDirectory.GetScripts()
+            IOrderedEnumerable<IMigrationScriptFile> files = _migrationDirectory.GetScripts(args)
                 .OrderByDescending(x => x.Version);
 
             IMigrationScriptFile latestFile = files.FirstOrDefault();

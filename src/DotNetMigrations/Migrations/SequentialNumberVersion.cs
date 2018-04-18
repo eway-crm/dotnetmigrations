@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DotNetMigrations.Core;
 
 namespace DotNetMigrations.Migrations
 {
@@ -8,12 +9,12 @@ namespace DotNetMigrations.Migrations
     {
         #region IVersionStrategy Members
 
-        public long GetNewVersionNumber(IMigrationDirectory migrationDirectory)
+        public long GetNewVersionNumber(IMigrationDirectory migrationDirectory, IScriptsDirectoryPathArgs args)
         {
             long lastNumber = 0;
 
             // get the latest number in use
-            IEnumerable<IMigrationScriptFile> scripts = migrationDirectory.GetScripts();
+            IEnumerable<IMigrationScriptFile> scripts = migrationDirectory.GetScripts(args);
 
             if (scripts.Count() > 0)
             {

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using DotNetMigrations.Core;
+using DotNetMigrations.Commands;
 
 namespace DotNetMigrations.Migrations
 {
@@ -39,9 +40,20 @@ namespace DotNetMigrations.Migrations
         /// Returns the migration script path from the
         /// config file (if available) or the default path.
         /// </summary>
-        public string GetPath(ILogger log)
+        public string GetPath(ILogger log, IScriptsDirectoryPathArgs args)
         {
-            string path = _configurationManager.AppSettings[AppSettingKeys.MigrateFolder];
+            if (args == null)
+                throw new ArgumentNullException("args");
+
+            string path;
+            if (!string.IsNullOrEmpty(args.ScriptsDirectoryPath))
+            {
+                path = args.ScriptsDirectoryPath;
+            }
+            else
+            {
+                path = _configurationManager.AppSettings[AppSettingKeys.MigrateFolder];
+            }
 
             if (string.IsNullOrEmpty(path))
             {
@@ -63,9 +75,9 @@ namespace DotNetMigrations.Migrations
         /// Returns a list of all the migration script file paths
         /// sorted by version number (ascending).
         /// </summary>
-        public IEnumerable<IMigrationScriptFile> GetScripts()
+        public IEnumerable<IMigrationScriptFile> GetScripts(IScriptsDirectoryPathArgs args)
         {
-            string[] files = Directory.GetFiles(GetPath(null), ScriptFileNamePattern);
+            string[] files = Directory.GetFiles(GetPath(null, args), ScriptFileNamePattern);
 
             return files.Select(x => (IMigrationScriptFile)new MigrationScriptFile(x)).OrderBy(x => x.Version);
         }
@@ -73,13 +85,12 @@ namespace DotNetMigrations.Migrations
         /// <summary>
         /// Creates a blank migration script with the given name.
         /// </summary>
-        /// <param name="migrationName">name of the migration script</param>
         /// <returns>The path to the new migration script.</returns>
-        public string CreateBlankScript(string migrationName)
+        public string CreateBlankScript(GenerateScriptCommandArgs args)
         {
-            long version = GetNewVersionNumber();
-            var path = GetPath(null);
-            path = Path.Combine(path, version + "_" + SanitizeMigrationName(migrationName) + ".sql");
+            long version = GetNewVersionNumber(args);
+            var path = GetPath(null, args);
+            path = Path.Combine(path, version + "_" + SanitizeMigrationName(args.MigrationName) + ".sql");
 
             var setup = new System.Text.StringBuilder();
             setup.AppendLine("SET XACT_ABORT ON;");
@@ -122,11 +133,11 @@ namespace DotNetMigrations.Migrations
         /// <summary>
         /// Generates a new version number for assignment.
         /// </summary>
-        private long GetNewVersionNumber()
+        private long GetNewVersionNumber(GenerateScriptCommandArgs args)
         {
             var factory = new VersionStrategyFactory(_configurationManager);
             IVersionStrategy strategy = factory.GetStrategy();
-            long version = strategy.GetNewVersionNumber(this);
+            long version = strategy.GetNewVersionNumber(this, args);
             return version;
         }
     }
