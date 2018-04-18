@@ -98,7 +98,7 @@ namespace DotNetMigrations.Migrations
             sb.AppendLine();
             sb.Append(TeardownEndTag);
 
-            File.WriteAllText(FilePath, sb.ToString());
+            File.WriteAllText(FilePath, sb.ToString(), Encoding.UTF8);
         }
 
         #endregion

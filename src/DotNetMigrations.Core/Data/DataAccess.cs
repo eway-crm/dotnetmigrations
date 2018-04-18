@@ -15,7 +15,7 @@ namespace DotNetMigrations.Core.Data
         {
             _factory = factory;
             _provider = provider;
-            _commandTimeout = commandTimeout;
+            _commandTimeout = commandTimeout ?? 0;
             _connection = GetConnection(connectionString);
         }
 

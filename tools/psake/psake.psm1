@@ -181,7 +181,7 @@ function Configure-BuildEnvironment
     {
       'x86' { $bitness = 'Framework' }
       'x64' { $bitness = 'Framework64' }
-      $null {
+      { [string]::IsNullOrEmpty($_) } {
         $ptrSize = [System.IntPtr]::Size
         switch ($ptrSize)
         {

@@ -81,7 +81,12 @@ namespace DotNetMigrations.Migrations
             var path = GetPath(null);
             path = Path.Combine(path, version + "_" + SanitizeMigrationName(migrationName) + ".sql");
 
-            var contents = new MigrationScriptContents(null, null);
+            var setup = new System.Text.StringBuilder();
+            setup.AppendLine("SET XACT_ABORT ON;");
+            setup.AppendLine("");
+            setup.Append("-- TODO: Replace with script implementation");
+
+            var contents = new MigrationScriptContents(setup.ToString(), null);
             
             var file = new MigrationScriptFile(path);
             file.Write(contents);
