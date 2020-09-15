@@ -137,26 +137,35 @@ namespace DotNetMigrations.Commands
 
         private void ExecuteMigrationScripts(IEnumerable<KeyValuePair<IMigrationScriptFile, string>> scripts, Action<DbTransaction, long> updateVersionAction)
         {
-            using (DbTransaction tran = Database.BeginTransaction())
+            foreach (var script in scripts)
             {
                 IMigrationScriptFile currentScript = null;
-                try
+                using (DbTransaction tran = this.Database.BeginTransaction())
                 {
-                    foreach (var script in scripts)
+                    try
                     {
                         currentScript = script.Key;
                         Database.ExecuteScript(tran, script.Value);
                         updateVersionAction(tran, script.Key.Version);
+
+                        var command = this.Database.CreateCommand();
+                        command.CommandText = "SELECT @@TRANCOUNT";
+                        command.Transaction = tran;
+
+                        if (Convert.ToInt32(command.ExecuteScalar()) != 1)
+                        {
+                            throw new InvalidOperationException("There should be only one transaction running. Check the script for unclosed transactions!");
+                        }
+
+                        tran.Commit();
                     }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
 
-                    tran.Commit();
-                }
-                catch (Exception ex)
-                {
-                    tran.Rollback();
-
-                    string filePath = (currentScript == null) ? "NULL" : currentScript.FilePath;
-                    throw new MigrationException("Error executing migration script: " + filePath, filePath, ex);
+                        string filePath = (currentScript == null) ? "NULL" : currentScript.FilePath;
+                        throw new MigrationException("Error executing migration script: " + filePath, filePath, ex);
+                    }
                 }
             }
         }
