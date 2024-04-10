@@ -77,7 +77,7 @@ namespace DotNetMigrations.Migrations
         /// </summary>
         public IEnumerable<IMigrationScriptFile> GetScripts(IScriptsDirectoryPathArgs args)
         {
-            string[] files = Directory.GetFiles(GetPath(null, args), ScriptFileNamePattern);
+            string[] files = Directory.GetFiles(GetPath(null, args), args.ScriptsSearchPattern ?? ScriptFileNamePattern);
 
             return files.Select(x => (IMigrationScriptFile)new MigrationScriptFile(x)).OrderBy(x => x.Version);
         }

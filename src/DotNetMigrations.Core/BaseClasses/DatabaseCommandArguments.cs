@@ -13,5 +13,8 @@ namespace DotNetMigrations.Core
 
         [Argument("scriptsDirectoryPath", "scriptsDir", "The directory where the migration scripts are located.")]
         public string ScriptsDirectoryPath { get; set; }
+
+        [Argument("scriptsSearchPattern", "pattern", "Scripts search pattern.")]
+        public string ScriptsSearchPattern { get; set; }
     }
 }
